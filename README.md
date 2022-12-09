@@ -1,5 +1,4 @@
-# SDF Mini Project for Colleze
+# Software Developement Fundamentals - Mini Project
 
-> **Current Ideas**
->> The Usual: Calculator, Bank Management,
->> Hotel Management etc.
+>> The current task is to create a _Library Management System_ in **C** language using 
+>> File Handling, Pointers, Structures etc.
