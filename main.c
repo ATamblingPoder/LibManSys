@@ -1,6 +1,6 @@
 #include<stdio.h>
 
-int initialize(int student_id, int teacher_id){
+void initialize(int student_id, int teacher_id){
 	// File Handling Code
 	// NeEd To CoDe MoRe StUfF
 }
