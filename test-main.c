@@ -11,9 +11,10 @@ void print_students();
 void librarian_options();
 void add_students();
 void print_books();
-void remove_student(int stud_id_to_remove);
+void remove_student();
 void assign_book();
-int in_num(int to_find, int array_to_search[]);
+int does_it_exist_s(int id_to_check);
+int does_it_exist_b(int b_id_to_check);
 
 int *list_of_ids, number_of_ids = 0, number_of_b_ids = 0;
 char dummy;
@@ -27,10 +28,90 @@ struct Book{
 	char b_name[50];
 };
 
-void remove_student(int stud_id_to_remove){
-
+int does_it_exist_s(int id_to_check){
+	FILE *reader_exists;
+	reader_exists = fopen("students.dat", "rb");
+	struct Student temp_checking_existence;
+	while(fread(&temp_checking_existence, sizeof(temp_checking_existence), 1, reader_exists)){
+		if(id_to_check == temp_checking_existence.self_id){
+			fclose(reader_exists);
+			return 1;
+		}
+	}
+	fclose(reader_exists);
+	return 0;
 }
 
+int does_it_exist_b(int b_id_to_check){
+	FILE *reader_exists_b;
+	reader_exists_b = fopen("books.dat", "rb");
+	struct Book temp_checking_existence_b;
+	while(fread(&temp_checking_existence_b, sizeof(temp_checking_existence_b), 1, reader_exists_b)){
+		if(b_id_to_check == temp_checking_existence_b.id){
+			fclose(reader_exists_b);
+			return 1;
+		}
+	}
+	fclose(reader_exists_b);
+	return 0;
+}
+
+void remove_student(){
+	figletize();
+	printf("\n-----------------------------------");
+	print_students();
+	printf("\n-----------------------------------");
+	printf("\nEnter Student ID to remove: \nl> ");
+	int temp_id_to_remove;
+	scanf("%d", &temp_id_to_remove);
+	dummy = getchar();
+}
+
+void assign_book(){
+	print_books();
+	printf("\n----------------------------------");
+	print_students();
+	printf("\n----------------------------------");
+	int correct = 0, temp_id, temp_b_id;
+	struct Student reading_temp;
+	while(!correct){
+		printf("\nEnter Student Id: ");
+		printf("\nl> ");
+		scanf("%d", &temp_id);
+		char dummy = getchar();
+		correct = does_it_exist_s(temp_id);
+	}
+	int correct_b = 0;
+	struct Book temp_book;
+	while(!correct_b){
+		printf("\nEnter Book Id: ");
+		printf("\nl> ");
+		scanf("%d", &temp_b_id);
+		char dummy = getchar();
+		correct_b = does_it_exist_b(temp_b_id);
+	}
+	FILE *reader, *writer;
+	reader = fopen("students.dat", "rb");
+	writer = fopen("temp_students.dat", "wb");
+	struct Student temp1, temp2;
+	while(fread(&temp2, sizeof(temp2), 1, reader)){
+		temp1.self_id = temp2.self_id;
+		strcpy(temp1.name, temp2.name);
+		strcpy(temp1.password, temp2.password);
+		if(temp2.self_id == temp_id){
+			temp1.book_id = temp_b_id;
+		}
+		else
+			temp1.book_id = temp2.book_id;
+		fwrite(&temp1, sizeof(temp1), 1, writer);
+	}
+	fclose(reader);
+	fclose(writer);
+	remove("students.dat");
+	rename("temp_students.dat", "students.dat");
+}
+
+/*
 int in_num(int to_find, int *array_to_search){
 	for(int i = 0; i < number_of_ids; i++){
 		printf("%d", *(array_to_search + i));
@@ -39,6 +120,9 @@ int in_num(int to_find, int *array_to_search){
 	}
 	return 0;
 }
+*/
+
+
 
 void add_students(){
 	printf("Enter number of student records to add: ");
@@ -46,21 +130,24 @@ void add_students(){
 	int num_add_students;
 	scanf("%d", &num_add_students);
 	dummy = getchar();
-	FILE *adding_students;
-	adding_students = fopen("students.dat", "ab");
 	struct Student adding_adding_students;
 	for(int i = 0; i < num_add_students; i++){
 		char temp_name[20], temp_password[20];
-		int temp_self_id, temp_book_id = -1;
+		int temp_self_id, temp_book_id = -1, temp_id_exists;
 		printf("Enter Name: \nl> ");
 		fgets(temp_name, 20, stdin);
 		temp_name[strcspn(temp_name, "\n")] = 0;
 		temp_name[19] = '\0';
 		temp_self_id = 0;
-		while(!in_num(temp_self_id, list_of_ids)){
+		temp_id_exists = 1;
+		while(temp_id_exists){
 			printf("\nEnter ID: \nl> ");
 			scanf("%d", &temp_self_id);
-			dummy = getchar();}
+			dummy = getchar();
+			temp_id_exists = does_it_exist_s(temp_self_id);
+			if(temp_id_exists)
+				printf("\n------ ID already exists ------\n");
+		}
 		printf("\nEnter Student's Password: \nl> ");
 		scanf("%s", temp_password);
 		dummy = getchar();
@@ -68,9 +155,11 @@ void add_students(){
 		adding_adding_students.book_id = temp_book_id;
 		strcpy(adding_adding_students.name, temp_name);
 		strcpy(adding_adding_students.password, temp_password);
+		FILE *adding_students;
+		adding_students = fopen("students.dat", "ab");
 		fwrite(&adding_adding_students, sizeof(adding_adding_students), 1, adding_students);
+		fclose(adding_students);
 	}
-	fclose(adding_students);
 }
 
 void librarian_options(){
@@ -79,17 +168,21 @@ void librarian_options(){
 	printf("\n3. Show Books");
 	printf("\n4. Assign book to student");
 	printf("\n5. Remove Student");
-	int choice_librarian_options;
-	printf("\nl> ");
-	scanf("%d", &choice_librarian_options);
-	if(choice_librarian_options == 1)
-		print_students();
-	else if(choice_librarian_options == 2)
-		add_students();
-	else if(choice_librarian_options == 3)
-		print_books();
-	else
-		printf("Invalid Choice!");
+	printf("\n0 to exit. ");
+	int choice_librarian_options = 1;
+	while(choice_librarian_options){
+		printf("\nl> ");
+		scanf("%d", &choice_librarian_options);
+		dummy = getchar();
+		if(choice_librarian_options == 1)
+			print_students();
+		else if(choice_librarian_options == 2)
+			add_students();
+		else if(choice_librarian_options == 3)
+			print_books();
+		else if(choice_librarian_options == 4)
+			assign_book();
+	}
 }
 
 void read(){
@@ -105,7 +198,7 @@ void read(){
 		fread(&reading_reader, sizeof(reading_reader), 1, reader);
 		the_ids[i] = reading_reader.self_id;
 	}
-	list_of_ids = the_ids;
+	list_of_ids = &the_ids[0];
 	printf("\n");
 	for(int i = 0; i < number_of_ids; i++)
 		printf(" %d ", *(list_of_ids + i));
@@ -133,6 +226,7 @@ void print_students(){
 }
 
 void print_books(){
+	figletize();
 	FILE *b_printer;
 	b_printer = fopen("books.dat", "rb");
 	struct Book b_reading_printer;
