@@ -10,13 +10,35 @@ void read();
 void print_students();
 void librarian_options();
 void add_students();
+void print_books();
+void remove_student(int stud_id_to_remove);
+void assign_book();
+int in_num(int to_find, int array_to_search[]);
 
-int *list_of_ids, number_of_ids = 0;
+int *list_of_ids, number_of_ids = 0, number_of_b_ids = 0;
 char dummy;
 struct Student{
 	int self_id, book_id;
 	char name[20], password[20];
 };
+
+struct Book{
+	int id;
+	char b_name[50];
+};
+
+void remove_student(int stud_id_to_remove){
+
+}
+
+int in_num(int to_find, int *array_to_search){
+	for(int i = 0; i < number_of_ids; i++){
+		printf("%d", *(array_to_search + i));
+		if(to_find == *(array_to_search + i))
+			return 1;
+	}
+	return 0;
+}
 
 void add_students(){
 	printf("Enter number of student records to add: ");
@@ -33,12 +55,12 @@ void add_students(){
 		printf("Enter Name: \nl> ");
 		fgets(temp_name, 20, stdin);
 		temp_name[strcspn(temp_name, "\n")] = 0;
-//		strtok(temp_name, "\n");
-//		dummy = getchar();
 		temp_name[19] = '\0';
-		printf("\nEnter ID: \nl> ");
-		scanf("%d", &temp_self_id);
-		dummy = getchar();
+		temp_self_id = 0;
+		while(!in_num(temp_self_id, list_of_ids)){
+			printf("\nEnter ID: \nl> ");
+			scanf("%d", &temp_self_id);
+			dummy = getchar();}
 		printf("\nEnter Student's Password: \nl> ");
 		scanf("%s", temp_password);
 		dummy = getchar();
@@ -54,6 +76,9 @@ void add_students(){
 void librarian_options(){
 	printf("\n1. Print all students");
 	printf("\n2. Add Students");
+	printf("\n3. Show Books");
+	printf("\n4. Assign book to student");
+	printf("\n5. Remove Student");
 	int choice_librarian_options;
 	printf("\nl> ");
 	scanf("%d", &choice_librarian_options);
@@ -61,6 +86,8 @@ void librarian_options(){
 		print_students();
 	else if(choice_librarian_options == 2)
 		add_students();
+	else if(choice_librarian_options == 3)
+		print_books();
 	else
 		printf("Invalid Choice!");
 }
@@ -72,8 +99,26 @@ void read(){
 	while((fread(&reading_reader, sizeof(reading_reader), 1, reader)) != 0){
 		number_of_ids += 1;
 	}
+	int the_ids[number_of_ids];
+	fseek(reader, 0, SEEK_SET);
+	for(int i = 0; i < number_of_ids; i++){
+		fread(&reading_reader, sizeof(reading_reader), 1, reader);
+		the_ids[i] = reading_reader.self_id;
+	}
+	list_of_ids = the_ids;
+	printf("\n");
+	for(int i = 0; i < number_of_ids; i++)
+		printf(" %d ", *(list_of_ids + i));
 	printf("\n%d\n", number_of_ids);
 	fclose(reader);
+	FILE *breader;
+	breader = fopen("books.dat", "rb");
+	struct Book b_reading_reader;
+	while((fread(&b_reading_reader, sizeof(b_reading_reader), 1, breader)) != 0){
+		number_of_b_ids += 1;
+	}
+	printf("\n%d\n", number_of_b_ids);
+	fclose(breader);
 }
 
 void print_students(){
@@ -87,8 +132,26 @@ void print_students(){
 	fclose(printer);
 }
 
+void print_books(){
+	FILE *b_printer;
+	b_printer = fopen("books.dat", "rb");
+	struct Book b_reading_printer;
+	for(int i = 0; i < number_of_b_ids; i++){
+		fread(&b_reading_printer, sizeof(b_reading_printer), 1, b_printer);
+		printf("\n%d\t%s", b_reading_printer.id, b_reading_printer.b_name);
+	}
+	fclose(b_printer);
+}
+
 void initialize(){
 	struct Student first[3];
+	struct Book b_first[3];
+	b_first[0].id = 9999;
+	b_first[1].id = 1122;
+	b_first[2].id = 8869;
+	strcpy(b_first[0].b_name, "Sherlock Holmes");
+	strcpy(b_first[1].b_name, "The Alchemist");
+	strcpy(b_first[2].b_name, "Murder on The Orient Express");
 	first[0].self_id = 123456;
 	first[1].self_id = 898595;
 	first[2].self_id = 854808;
@@ -115,6 +178,21 @@ void initialize(){
 	else{
 		printf("Exists!");
 		fclose(fPtr);
+	}
+	FILE *bPtr;
+	bPtr = fopen("books.dat", "rb");
+	if(bPtr == NULL){
+		FILE *bPtr1;
+		bPtr1 = fopen("books.dat", "wb");
+		for(int i = 0; i < 3; i++){
+			fwrite(&(b_first[i]), sizeof((b_first[0])), 1, bPtr1);
+		}
+		fclose(bPtr1);
+
+	}
+	else{
+		printf("Exists!");
+		fclose(bPtr);
 	}
 }
 
