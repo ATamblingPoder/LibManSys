@@ -9,20 +9,58 @@ void initialize();
 void read();
 void print_students();
 void librarian_options();
+void add_students();
 
 int *list_of_ids, number_of_ids = 0;
+char dummy;
 struct Student{
 	int self_id, book_id;
 	char name[20], password[20];
 };
 
+void add_students(){
+	printf("Enter number of student records to add: ");
+	printf("\nl> ");
+	int num_add_students;
+	scanf("%d", &num_add_students);
+	dummy = getchar();
+	FILE *adding_students;
+	adding_students = fopen("students.dat", "ab");
+	struct Student adding_adding_students;
+	for(int i = 0; i < num_add_students; i++){
+		char temp_name[20], temp_password[20];
+		int temp_self_id, temp_book_id = -1;
+		printf("Enter Name: \nl> ");
+		fgets(temp_name, 20, stdin);
+		temp_name[strcspn(temp_name, "\n")] = 0;
+//		strtok(temp_name, "\n");
+//		dummy = getchar();
+		temp_name[19] = '\0';
+		printf("\nEnter ID: \nl> ");
+		scanf("%d", &temp_self_id);
+		dummy = getchar();
+		printf("\nEnter Student's Password: \nl> ");
+		scanf("%s", temp_password);
+		dummy = getchar();
+		adding_adding_students.self_id = temp_self_id;
+		adding_adding_students.book_id = temp_book_id;
+		strcpy(adding_adding_students.name, temp_name);
+		strcpy(adding_adding_students.password, temp_password);
+		fwrite(&adding_adding_students, sizeof(adding_adding_students), 1, adding_students);
+	}
+	fclose(adding_students);
+}
+
 void librarian_options(){
 	printf("\n1. Print all students");
+	printf("\n2. Add Students");
 	int choice_librarian_options;
 	printf("\nl> ");
 	scanf("%d", &choice_librarian_options);
-	if(choice_librarian_options)
+	if(choice_librarian_options == 1)
 		print_students();
+	else if(choice_librarian_options == 2)
+		add_students();
 	else
 		printf("Invalid Choice!");
 }
@@ -91,7 +129,7 @@ void librarian(){
 		char input[13];
 		scanf("%s", input);
 		input[12] = '\0';
-		char dummy = getchar();
+		dummy = getchar();
 		if(!strcmp(password, input)){
 			figletize();
 			printf("\nl> Login Successfull.\n");
