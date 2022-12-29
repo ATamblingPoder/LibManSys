@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+void clear();
 void figletize();
 void librarian();
 void initialize();
@@ -14,11 +15,15 @@ void print_books();
 void remove_student();
 void assign_book();
 void add_books();
-void remove_book();
+//void remove_book();
+void print_requests();
+void approve_request();
+void remove_request();
 int does_it_exist_s(int id_to_check);
 int does_it_exist_b(int b_id_to_check);
+//int does_it_exist_r(int r_id_to_check);
 
-int *list_of_ids, number_of_ids = 0, number_of_b_ids = 0;
+int *list_of_ids, number_of_ids = 0, number_of_b_ids = 0, number_of_requests = 0;
 char dummy;
 struct Student{
 	int self_id, book_id;
@@ -29,6 +34,12 @@ struct Book{
 	int id;
 	char b_name[50];
 };
+
+struct Requests{
+	int b_id, self_id;
+};
+
+
 
 int does_it_exist_s(int id_to_check){
 	FILE *reader_exists;
@@ -56,6 +67,87 @@ int does_it_exist_b(int b_id_to_check){
 	}
 	fclose(reader_exists_b);
 	return 0;
+}
+
+int does_it_exist_r(int r_id_to_check){
+	FILE *reader_exists_r;
+	reader_exists_r = fopen("requests.dat", "rb");
+	struct Requests temp_checking_existence_r;
+	while(fread(&temp_checking_existence_r, sizeof(temp_checking_existence_r), 1, reader_exists_r)){
+		if(r_id_to_check == temp_checking_existence_r.self_id){
+			fclose(reader_exists_r);
+			return 1;
+		}
+	}
+	fclose(reader_exists_r);
+	return 0;
+}
+
+void print_requests(){
+//	figletize();
+	read();
+	FILE *printer_request;
+	printer_request = fopen("requests.dat", "rb");
+	struct Requests reading_requests;
+	printf("\n----------------- REQUESTS -------------------------\n");
+	printf("\nBook ID\t\tStudent ID");
+	while(fread(&reading_requests, sizeof(reading_requests), 1, printer_request)){
+		printf("\n%d\t\t%d",reading_requests.b_id, reading_requests.self_id);
+	}
+	fclose(printer_request);
+	printf("\n----------------------------------------------------\n");
+}
+/*
+void approve_request(){
+	print_requests();
+	int r_id_to_remove_exists = 0, r_id_to_remove;
+	while(!r_id_to_remove_exists){
+		printf("\nEnter Request ID to approve\nl> ");
+		scanf("%d", &r_id_to_remove);
+		dummy = getchar();
+		r_id_to_remove_exists = does_it_exist_r(r_id_to_remove);
+		if(!r_id_to_remove_exists)
+			printf("\n ------ The R_ID does not exist ------\n");
+	}
+	struct Requests removing_request;
+
+}
+*/
+
+void approve_request(){
+	figletize();
+	print_requests();
+	printf("\nKindly Assign Book to Student, then remove request\n");
+}
+
+void remove_request(){
+	figletize();
+	print_requests();
+	int student_id_to_remove, does_student_exist = 0;
+	while(!does_student_exist){
+		printf("\nEnter Student ID for whose request has to be removed: ");
+		printf("\nl> ");
+		scanf("%d", &student_id_to_remove);
+		dummy = getchar();
+		does_student_exist = does_it_exist_r(student_id_to_remove);
+		if(!does_student_exist)
+			printf("\nEither invalid StudentID or Student has no requested books\n");
+	}
+	struct Requests temp_to_edit, temp_to_write;
+	FILE *to_read, *to_write;
+	to_read = fopen("requests.dat", "rb");
+	to_write = fopen("temp_requests.dat", "wb");
+	while(fread(&temp_to_edit, sizeof(temp_to_edit), 1, to_read)){
+		if(temp_to_edit.self_id != student_id_to_remove){
+			temp_to_write.self_id = temp_to_edit.self_id;
+			temp_to_write.b_id = temp_to_edit.b_id;
+			fwrite(&temp_to_write, sizeof(temp_to_write), 1, to_write);
+		}
+	}
+	fclose(to_read);
+	fclose(to_write);
+	remove("requests.dat");
+	rename("temp_requests.dat", "requests.dat");
 }
 
 void remove_student(){
@@ -92,7 +184,7 @@ void remove_student(){
 	rename("temp_students.dat", "students.dat");
 
 }
-
+/*
 void remove_book(){
 	figletize();
 	printf("\n-----------------------------------");
@@ -125,11 +217,10 @@ void remove_book(){
 	rename("temp_books.dat", "books.dat");
 
 }
+*/
 
 void assign_book(){
-	print_books();
-	printf("\n----------------------------------------------------\n");
-	print_students();
+	print_requests();
 	printf("\n----------------------------------------------------\n");
 	int correct = 0, temp_id, temp_b_id;
 	struct Student reading_temp;
@@ -255,7 +346,10 @@ void librarian_options(){
 		printf("\n4. Assign book to student");
 		printf("\n5. Remove Student");
 		printf("\n6. Add Books");
-		printf("\n7. Remove Book");
+//		printf("\n7. Remove Book");
+		printf("\n7. View Book Requests");
+		printf("\n8. Approve Book Requests");
+		printf("\n9. Remove Book Request");
 		printf("\n0 to exit. ");
 		printf("\nl> ");
 		scanf("%d", &choice_librarian_options);
@@ -272,14 +366,21 @@ void librarian_options(){
 			remove_student();
 		else if(choice_librarian_options == 6)
 			add_books();
+//		else if(choice_librarian_options == 7)
+//			remove_book();
 		else if(choice_librarian_options == 7)
-			remove_book();
+			print_requests();
+		else if(choice_librarian_options == 8)
+			approve_request();
+		else if(choice_librarian_options == 9)
+			remove_request();
 	}
 }
 
 void read(){
 	number_of_ids = 0;
 	number_of_b_ids = 0;
+	number_of_requests = 0;
 	FILE *reader;
 	reader = fopen("students.dat", "rb");
 	struct Student reading_reader;
@@ -293,10 +394,6 @@ void read(){
 		the_ids[i] = reading_reader.self_id;
 	}
 	list_of_ids = &the_ids[0];
-	printf("\n");
-	for(int i = 0; i < number_of_ids; i++)
-		printf(" %d ", *(list_of_ids + i));
-	printf("\n%d\n", number_of_ids);
 	fclose(reader);
 	FILE *breader;
 	breader = fopen("books.dat", "rb");
@@ -304,13 +401,19 @@ void read(){
 	while((fread(&b_reading_reader, sizeof(b_reading_reader), 1, breader)) != 0){
 		number_of_b_ids += 1;
 	}
-	printf("\n%d\n", number_of_b_ids);
 	fclose(breader);
+	struct Requests counting_requests;
+	FILE *rreader;
+	rreader = fopen("requests.dat", "rb");
+	while(fread(&counting_requests, sizeof(counting_requests), 1, rreader)){
+		number_of_requests += 1;
+	}
+	fclose(rreader);
 }
 
 void print_students(){
 	read();
-	figletize();
+//	figletize();
 	printf("\n---------------------- STUDENTS ------------------------------\n");
 	FILE *printer;
 	printer = fopen("students.dat", "rb");
@@ -324,7 +427,7 @@ void print_students(){
 }
 
 void print_books(){
-	figletize();
+//	figletize();
 	read();
 	printf("\n--------------------- BOOKS ------------------------\n");
 	FILE *b_printer;
@@ -389,6 +492,24 @@ void initialize(){
 		printf("Exists!");
 		fclose(bPtr);
 	}
+	FILE *rPtr;
+	struct Requests reqs[2];
+	reqs[0].self_id = 123456;
+	reqs[1].self_id = 854808;
+	reqs[0].b_id = 1122;
+	reqs[1].b_id = 8869;
+//	strcpy(reqs[0].b_name, "The Boy with The Striped Pajamas");
+//	strcpy(reqs[1].b_name, "Nothing Ventured");
+	rPtr = fopen("requests.dat", "rb");
+	if(rPtr == NULL){
+		FILE *rrPtr;
+		rrPtr = fopen("requests.dat", "wb");
+		for(int i = 0; i < 2; i++)	
+			fwrite(&(reqs[i]), sizeof(reqs[i]), 1, rrPtr);
+		fclose(rrPtr);
+	}
+	else
+		fclose(rPtr);
 }
 
 void librarian(){
@@ -439,7 +560,8 @@ void animate(){
 
 
 void figletize(){
-	printf("\e[1;1H\e[2J");
+	clear();
+//	printf("\e[1;1H\e[2J");
 	char figlet[] = "  _     _ _     __  __             ____            \n | |   (_) |__ |  \\/  | __ _ _ __ / ___| _   _ ___ \n | |   | | '_ \\| |\\/| |/ _` | '_ \\\\___ \\| | | / __|\n | |___| | |_) | |  | | (_| | | | |___) | |_| \\__ \\\n |_____|_|_.__/|_|  |_|\\__,_|_| |_|____/ \\__, |___/\n                                         |___/";
 	printf("%s\n", figlet);
 	printf("  Library Management System v 0.0.1\n");
