@@ -69,7 +69,6 @@ void return_a_book(int students_current_id){
 			tid2.self_id = tid1.self_id;
 			strcpy(tid2.name, tid1.name);
 			strcpy(tid2.password, tid1.password);
-			printf("\n%d", tid1.book_id);
 			if(tid1.self_id == students_current_id){
 				tid2.book_id = -1;
 			}
@@ -81,6 +80,8 @@ void return_a_book(int students_current_id){
 		fclose(bookreading);
 		remove("students.dat");
 		rename("temp_requests.dat", "students.dat");
+		figletize();
+		printf("\n----------------- BOOK RETURNED SUCCESSFULLY -----------------\n");
 	}
 }
 
@@ -90,6 +91,7 @@ void request_a_book(int students_current_id){
 		printf("\n!!!!!!!!!- YOUR ARE ALREADY IN THE REQUESTS DATABASE -!!!!!!!!\n");
 	}
 	else{
+		figletize();
 		print_books();
 		int chosen_book = 0;
 		while(!does_it_exist_b(chosen_book)){
@@ -106,6 +108,7 @@ void request_a_book(int students_current_id){
 		temp_requests.b_id = chosen_book;
 		fwrite(&temp_requests, sizeof(temp_requests), 1, rwriter);
 		fclose(rwriter);
+		figletize();
 	}
 
 }
@@ -146,12 +149,13 @@ void student(){
 			printf("\n!!!!!!!!!!!!!!!!!- WRONG PASSWORD -!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 		}
 	}
+	figletize();
+	printf("\n---------------------- LOGIN SUCCESSFULL ---------------------\n");
 	student_options();
 
 }
 
 void student_options(){
-	figletize();
 	int choice_student = 1;
 	while(choice_student){
 		printf("\nEnter Choice");
@@ -162,12 +166,18 @@ void student_options(){
 		printf("\ns> ");
 		scanf("%d", &choice_student);
 		dummy = getchar();
-		if(choice_student == 1)
+		if(choice_student == 1){
+			figletize();
 			print_books();
-		else if(choice_student == 2)
+		}
+		else if(choice_student == 2){
+			figletize();
 			request_a_book(students_current_id);
-		else if(choice_student == 3)
+		}
+		else if(choice_student == 3){
+			figletize();
 			return_a_book(students_current_id);
+		}
 	}
 }
 
@@ -214,61 +224,72 @@ int does_it_exist_r(int r_id_to_check){
 }
 
 void print_requests(){
-//	figletize();
 	read();
-	FILE *printer_request;
-	printer_request = fopen("requests.dat", "rb");
-	struct Requests reading_requests;
-	printf("\n----------------------- REQUESTS -----------------------------\n");
-	printf("\nBook ID\t\tStudent ID");
-	while(fread(&reading_requests, sizeof(reading_requests), 1, printer_request)){
-		printf("\n%d\t\t%d",reading_requests.b_id, reading_requests.self_id);
+	if(number_of_requests == 0){
+		printf("\n!!!!!!!!!!!!!!!!!- NO REQUESTS IN DATABASE -!!!!!!!!!!!!!!!!\n");
 	}
-	fclose(printer_request);
-	printf("\n--------------------------------------------------------------\n");
+	else{
+		FILE *printer_request;
+		printer_request = fopen("requests.dat", "rb");
+		struct Requests reading_requests;
+		printf("\n----------------------- REQUESTS -----------------------------\n");
+		printf("\nBook ID\t\tStudent ID");
+		while(fread(&reading_requests, sizeof(reading_requests), 1, printer_request)){
+			printf("\n%d\t\t%d",reading_requests.b_id, reading_requests.self_id);
+		}
+		fclose(printer_request);
+		printf("\n--------------------------------------------------------------\n");
+	}
 }
 
 void approve_request(){
 	figletize();
 	print_requests();
-	printf("\n-- ASSIGN BOOK TO STUDENT THEN REMOVE REQUEST --\n");
+	if(number_of_requests != 0)
+		printf("\n--------- ASSIGN BOOK TO STUDENT THEN REMOVE REQUEST ---------\n");
 }
 
 void remove_request(){
+	read();
 	figletize();
-	print_requests();
-	int student_id_to_remove, does_student_exist = 0;
-	while(!does_student_exist){
-		printf("\nEnter Student ID for whose request has to be removed: ");
-		printf("\nl> ");
-		scanf("%d", &student_id_to_remove);
-		dummy = getchar();
-		does_student_exist = does_it_exist_r(student_id_to_remove);
-		if(!does_student_exist)
-			printf("\nEither invalid StudentID or Student has no requested books\n");
+	if(number_of_requests == 0){
+		printf("\n!!!!!!!!!!!!!!!!!- NO REQUESTS IN DATABASE -!!!!!!!!!!!!!!!!\n");
 	}
-	struct Requests temp_to_edit, temp_to_write;
-	FILE *to_read, *to_write;
-	to_read = fopen("requests.dat", "rb");
-	to_write = fopen("temp_requests.dat", "wb");
-	while(fread(&temp_to_edit, sizeof(temp_to_edit), 1, to_read)){
-		if(temp_to_edit.self_id != student_id_to_remove){
-			temp_to_write.self_id = temp_to_edit.self_id;
-			temp_to_write.b_id = temp_to_edit.b_id;
-			fwrite(&temp_to_write, sizeof(temp_to_write), 1, to_write);
+	else{
+		print_requests();
+		int student_id_to_remove, does_student_exist = 0;
+		while(!does_student_exist){
+			printf("\nEnter Student ID for whose request has to be removed: ");
+			printf("\nl> ");
+			scanf("%d", &student_id_to_remove);
+			dummy = getchar();
+			does_student_exist = does_it_exist_r(student_id_to_remove);
+			if(!does_student_exist)
+				printf("\n- EITHER INVALID STUDENTID OR STUDENT HAS NO REQUESTED BOOKS -\n");
 		}
+		struct Requests temp_to_edit, temp_to_write;
+		FILE *to_read, *to_write;
+		to_read = fopen("requests.dat", "rb");
+		to_write = fopen("temp_requests.dat", "wb");
+		while(fread(&temp_to_edit, sizeof(temp_to_edit), 1, to_read)){
+			if(temp_to_edit.self_id != student_id_to_remove){
+				temp_to_write.self_id = temp_to_edit.self_id;
+				temp_to_write.b_id = temp_to_edit.b_id;
+				fwrite(&temp_to_write, sizeof(temp_to_write), 1, to_write);
+			}
+		}
+		fclose(to_read);
+		fclose(to_write);
+		remove("requests.dat");
+		rename("temp_requests.dat", "requests.dat");
+		figletize();
+		printf("\n--------------- REMOVAL OF REQUEST SUCCESSFULL ---------------\n");
 	}
-	fclose(to_read);
-	fclose(to_write);
-	remove("requests.dat");
-	rename("temp_requests.dat", "requests.dat");
 }
 
 void remove_student(){
 	figletize();
-	printf("\n-------------------------------------------------------------\n");
 	print_students();
-	printf("\n-------------------------------------------------------------\n");
 	int temp_id_to_remove_exists = 0, temp_id_to_remove;
 	while(!temp_id_to_remove_exists){
 		printf("\nEnter Student ID to remove: \nl> ");
@@ -276,9 +297,8 @@ void remove_student(){
 		dummy = getchar();
 		temp_id_to_remove_exists = does_it_exist_s(temp_id_to_remove);
 		if(!temp_id_to_remove_exists)
-			printf("\n Student ID not in database. ");
+			printf("\n!!!!!!!!!!!!!!!!- STUDENT ID NOT IN DATABASE -!!!!!!!!!!!!!!!!\n");
 	}
-	printf("\nID TO REMOVE IS %d\n", temp_id_to_remove);
 	struct Student tempid1, tempid2;
 	FILE *reading, *writing;
 	reading = fopen("students.dat", "rb");
@@ -296,6 +316,8 @@ void remove_student(){
 	fclose(writing);
 	remove("students.dat");
 	rename("temp_students.dat", "students.dat");
+	figletize();
+	printf("\n------------------ ID REMOVED SUCCESSFULLY -------------------\n");
 
 }
 /*
@@ -335,7 +357,6 @@ void remove_book(){
 
 void assign_book(){
 	print_requests();
-	printf("\n--------------------------------------------------------------\n");
 	int correct = 0, temp_id, temp_b_id;
 	struct Student reading_temp;
 	while(!correct){
@@ -376,6 +397,8 @@ void assign_book(){
 	fclose(writer);
 	remove("students.dat");
 	rename("temp_students.dat", "students.dat");
+	figletize();
+	printf("\n----------------- BOOK ASSIGNED SUCCESSFULLY -----------------\n");
 }
 
 void add_students(){
@@ -414,6 +437,8 @@ void add_students(){
 		fwrite(&adding_adding_students, sizeof(adding_adding_students), 1, adding_students);
 		fclose(adding_students);
 	}
+	figletize();
+	printf("\n------------- STUDENT RECORD ADDED SUCCESSFULLY --------------\n");
 }
 
 void add_books(){
@@ -449,6 +474,8 @@ void add_books(){
 		fwrite(&adding_adding_books, sizeof(adding_adding_books), 1, adding_books);
 		fclose(adding_books);
 	}
+	figletize();
+	printf("\n----------------- BOOK(S) ADDED SUCCESSFULLY -----------------\n");
 }
 
 void librarian_options(){
@@ -545,12 +572,13 @@ void print_students(){
 	read();
 //	figletize();
 	printf("\n---------------------- STUDENTS ------------------------------\n");
+	printf("\nSTUDENT ID\tNAME\t\tBOOK ISSUED\n");
 	FILE *printer;
 	printer = fopen("students.dat", "rb");
 	struct Student reading_printer;
 	for(int i = 0; i < number_of_ids; i++){
 		fread(&reading_printer, sizeof(reading_printer), 1, printer);
-		printf("\n%d\t%s\t%d", reading_printer.self_id, reading_printer.name, reading_printer.book_id);
+		printf("\n%d\t%s\t\t%d", reading_printer.self_id, reading_printer.name, reading_printer.book_id);
 	}
 	fclose(printer);
 	printf("\n--------------------------------------------------------------\n");
@@ -560,12 +588,13 @@ void print_books(){
 //	figletize();
 	read();
 	printf("\n-------------------------- BOOKS -----------------------------\n");
+	printf("\nBOOK ID\t\tBOOK NAME\n");
 	FILE *b_printer;
 	b_printer = fopen("books.dat", "rb");
 	struct Book b_reading_printer;
 	for(int i = 0; i < number_of_b_ids; i++){
 		fread(&b_reading_printer, sizeof(b_reading_printer), 1, b_printer);
-		printf("\n%d\t%s", b_reading_printer.id, b_reading_printer.b_name);
+		printf("\n%d\t\t%s", b_reading_printer.id, b_reading_printer.b_name);
 	}
 	fclose(b_printer);
 	printf("\n--------------------------------------------------------------\n");
