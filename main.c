@@ -57,7 +57,8 @@ void return_a_book(int students_current_id){
 	}
 	fclose(checkingissuance);
 	if(is_book_issued == -1){
-		printf("\nYou have no book issued.\n");
+		figletize();
+		printf("\n!!!!!!!!!!!!!!!!!!- YOU HAVE NO BOOK ISSUED -!!!!!!!!!!!!!!!!!\n");
 	}
 	else{
 		FILE *bookreading, *bookwriting;
@@ -85,7 +86,8 @@ void return_a_book(int students_current_id){
 
 void request_a_book(int students_current_id){
 	if(does_it_exist_r(students_current_id)){
-		printf("\nYour are already in the requests database. ");
+		figletize();
+		printf("\n!!!!!!!!!- YOUR ARE ALREADY IN THE REQUESTS DATABASE -!!!!!!!!\n");
 	}
 	else{
 		print_books();
@@ -139,10 +141,9 @@ void student(){
 		scanf("%s", student_current_password);
 		dummy = getchar();
 		student_current_password[strcspn(student_current_password, "\n")] = 0;
-		puts(student_current_password);
 		correct_password_entered = check_password(student_current_password);
 		if(!correct_password_entered){
-			printf("\nWrong Password!\n");
+			printf("\n!!!!!!!!!!!!!!!!!- WRONG PASSWORD -!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 		}
 	}
 	student_options();
@@ -150,6 +151,7 @@ void student(){
 }
 
 void student_options(){
+	figletize();
 	int choice_student = 1;
 	while(choice_student){
 		printf("\nEnter Choice");
@@ -217,35 +219,19 @@ void print_requests(){
 	FILE *printer_request;
 	printer_request = fopen("requests.dat", "rb");
 	struct Requests reading_requests;
-	printf("\n----------------- REQUESTS -------------------------\n");
+	printf("\n----------------------- REQUESTS -----------------------------\n");
 	printf("\nBook ID\t\tStudent ID");
 	while(fread(&reading_requests, sizeof(reading_requests), 1, printer_request)){
 		printf("\n%d\t\t%d",reading_requests.b_id, reading_requests.self_id);
 	}
 	fclose(printer_request);
-	printf("\n----------------------------------------------------\n");
+	printf("\n--------------------------------------------------------------\n");
 }
-/*
-void approve_request(){
-	print_requests();
-	int r_id_to_remove_exists = 0, r_id_to_remove;
-	while(!r_id_to_remove_exists){
-		printf("\nEnter Request ID to approve\nl> ");
-		scanf("%d", &r_id_to_remove);
-		dummy = getchar();
-		r_id_to_remove_exists = does_it_exist_r(r_id_to_remove);
-		if(!r_id_to_remove_exists)
-			printf("\n ------ The R_ID does not exist ------\n");
-	}
-	struct Requests removing_request;
-
-}
-*/
 
 void approve_request(){
 	figletize();
 	print_requests();
-	printf("\nKindly Assign Book to Student, then remove request\n");
+	printf("\n-- ASSIGN BOOK TO STUDENT THEN REMOVE REQUEST --\n");
 }
 
 void remove_request(){
@@ -280,9 +266,9 @@ void remove_request(){
 
 void remove_student(){
 	figletize();
-	printf("\n-----------------------------------");
+	printf("\n-------------------------------------------------------------\n");
 	print_students();
-	printf("\n-----------------------------------");
+	printf("\n-------------------------------------------------------------\n");
 	int temp_id_to_remove_exists = 0, temp_id_to_remove;
 	while(!temp_id_to_remove_exists){
 		printf("\nEnter Student ID to remove: \nl> ");
@@ -349,7 +335,7 @@ void remove_book(){
 
 void assign_book(){
 	print_requests();
-	printf("\n----------------------------------------------------\n");
+	printf("\n--------------------------------------------------------------\n");
 	int correct = 0, temp_id, temp_b_id;
 	struct Student reading_temp;
 	while(!correct){
@@ -369,7 +355,7 @@ void assign_book(){
 		char dummy = getchar();
 		correct_b = does_it_exist_b(temp_b_id);
 		if(!correct_b)
-			printf("\nBook does not exist in database. \n");
+			printf("\n!!!!!!- BOOK DOES NOT EXIST IN DATABASE -!!!!!!\n");
 	}
 	FILE *reader, *writer;
 	reader = fopen("students.dat", "rb");
@@ -393,7 +379,7 @@ void assign_book(){
 }
 
 void add_students(){
-	printf("Enter number of student records to add: ");
+	printf("\nEnter number of student records to add: ");
 	printf("\nl> ");
 	int num_add_students;
 	scanf("%d", &num_add_students);
@@ -414,7 +400,7 @@ void add_students(){
 			dummy = getchar();
 			temp_id_exists = does_it_exist_s(temp_self_id);
 			if(temp_id_exists)
-				printf("\n------ ID already exists ------\n");
+				printf("\n!!!!!!!!!!!!!!!!- ID ALREADY EXISTS -!!!!!!!!!!!!!!!!!!!!!!!\n");
 		}
 		printf("\nEnter Student's Password: \nl> ");
 		scanf("%s", temp_password);
@@ -454,7 +440,7 @@ void add_books(){
 			dummy = getchar();
 			temp_b_id_exists = does_it_exist_b(id);
 			if(temp_b_id_exists)
-				printf("\n------ ID already exists ------\n");
+				printf("\n!!!!!!!!!!!!!!!!- ID ALREADY EXISTS -!!!!!!!!!!!!!!!!!!!!!!!\n");
 		}
 		adding_adding_books.id = id;
 		strcpy(adding_adding_books.b_name, temp_b_name);
@@ -482,26 +468,42 @@ void librarian_options(){
 		printf("\nl> ");
 		scanf("%d", &choice_librarian_options);
 		dummy = getchar();
-		if(choice_librarian_options == 1)
+		if(choice_librarian_options == 1){
+			figletize();
 			print_students();
-		else if(choice_librarian_options == 2)
+		}
+		else if(choice_librarian_options == 2){
+			figletize();
 			add_students();
-		else if(choice_librarian_options == 3)
+			figletize();
+		}
+		else if(choice_librarian_options == 3){
+			figletize();
 			print_books();
-		else if(choice_librarian_options == 4)
+		}
+		else if(choice_librarian_options == 4){
+			figletize();
 			assign_book();
-		else if(choice_librarian_options == 5)
+		}
+		else if(choice_librarian_options == 5){
+			figletize();
 			remove_student();
-		else if(choice_librarian_options == 6)
+		}
+		else if(choice_librarian_options == 6){
+			figletize();
 			add_books();
-//		else if(choice_librarian_options == 7)
-//			remove_book();
-		else if(choice_librarian_options == 7)
-			print_requests();
-		else if(choice_librarian_options == 8)
+		}
+		else if(choice_librarian_options == 7){
+			figletize();
+			print_requests();}
+		else if(choice_librarian_options == 8){
+			figletize();
 			approve_request();
-		else if(choice_librarian_options == 9)
+		}
+		else if(choice_librarian_options == 9){
+			figletize();
 			remove_request();
+		}
 	}
 }
 
@@ -548,16 +550,16 @@ void print_students(){
 	struct Student reading_printer;
 	for(int i = 0; i < number_of_ids; i++){
 		fread(&reading_printer, sizeof(reading_printer), 1, printer);
-		printf("\n%d\t%s\t%d\t%s", reading_printer.self_id, reading_printer.name, reading_printer.book_id, reading_printer.password);
+		printf("\n%d\t%s\t%d", reading_printer.self_id, reading_printer.name, reading_printer.book_id);
 	}
 	fclose(printer);
-	printf("\n----------------------------------------------------\n");
+	printf("\n--------------------------------------------------------------\n");
 }
 
 void print_books(){
 //	figletize();
 	read();
-	printf("\n--------------------- BOOKS ------------------------\n");
+	printf("\n-------------------------- BOOKS -----------------------------\n");
 	FILE *b_printer;
 	b_printer = fopen("books.dat", "rb");
 	struct Book b_reading_printer;
@@ -566,7 +568,7 @@ void print_books(){
 		printf("\n%d\t%s", b_reading_printer.id, b_reading_printer.b_name);
 	}
 	fclose(b_printer);
-	printf("\n----------------------------------------------------\n");
+	printf("\n--------------------------------------------------------------\n");
 }
 
 void initialize(){
@@ -642,7 +644,6 @@ void initialize(){
 
 void librarian(){
 	figletize();
-	printf("\n------ In librarian() ------\n");
 	char password[] = "librarian123";
 	int correct = 1;
 	while(correct == 1){
@@ -659,7 +660,7 @@ void librarian(){
 			correct = 0;
 		}
 		else{
-			printf("\n----|| Invalid password! ||----\n");
+			printf("\n!!!!!!!!!!!!!!!!- INVALID PASSWORD -!!!!!!!!!!!!!!!!!!!!!!!!\n");
 		}
 	}
 }
@@ -687,7 +688,7 @@ void figletize(){
 	char figlet[] = "  _     _ _     __  __             ____            \n | |   (_) |__ |  \\/  | __ _ _ __ / ___| _   _ ___ \n | |   | | '_ \\| |\\/| |/ _` | '_ \\\\___ \\| | | / __|\n | |___| | |_) | |  | | (_| | | | |___) | |_| \\__ \\\n |_____|_|_.__/|_|  |_|\\__,_|_| |_|____/ \\__, |___/\n                                         |___/";
 	printf("%s\n", figlet);
 	printf("  Library Management System v 0.0.1\n");
-	printf("---------------------------------------------------------\n");
+	printf("--------------------------------------------------------------\n");
 }
 
 void clear(){
@@ -723,7 +724,7 @@ int main(){
 			correct = 1;
 		}
 		else
-			printf("\n+++--- Invalid ---+++\n");
+			printf("\n!!!!!!!!!!!!!!!!!- INVALID CHOICE -!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	}	
 	return 0;
 }
