@@ -10,8 +10,6 @@ This a _Library Management System_ in **C** language using File Handling, Pointe
 ##### _``mingw``_
 
 
-[========]
-
 #### 1. Open your terminal
 #### 2. Clone this Repository
 ##### ``$ git clone https://github.com/ATamblingPoder/LibManSys.git``
