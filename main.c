@@ -3,14 +3,14 @@
 #include<stdlib.h>
 #include<string.h>
 
-void clear();
-void figletize();
-void librarian();
-void initialize();
-void read();
+void clear(); // Cleares the screen
+void figletize(); // Prints pretty LibManSys
+void librarian(); // Called from main()
+void initialize(); // Check if files exist and if not, created them
+void read(); // Reads the number of books, students and requests
 void print_students();
-void librarian_options();
-void add_students();
+void librarian_options(); // Options for librarian
+void add_students(); // Lets the librarian add more students
 void print_books();
 void remove_student();
 void assign_book();
@@ -31,6 +31,7 @@ char student_current_password[20];
 
 int *list_of_ids, number_of_ids = 0, number_of_b_ids = 0, number_of_requests = 0;
 char dummy;
+
 struct Student{
 	int self_id, book_id;
 	char name[20], password[20];
