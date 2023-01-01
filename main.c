@@ -488,7 +488,6 @@ void librarian_options(){
 		printf("\n4. Assign book to student");
 		printf("\n5. Remove Student");
 		printf("\n6. Add Books");
-//		printf("\n7. Remove Book");
 		printf("\n7. View Book Requests");
 		printf("\n8. Approve Book Requests");
 		printf("\n9. Remove Book Request");
