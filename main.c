@@ -29,7 +29,7 @@ int check_password(char password_to_check[]);
 int students_current_id;
 char student_current_password[20];
 
-int *list_of_ids, number_of_ids = 0, number_of_b_ids = 0, number_of_requests = 0;
+int number_of_ids = 0, number_of_b_ids = 0, number_of_requests = 0;
 char dummy;
 
 struct Student{
@@ -544,13 +544,6 @@ void read(){
 	while((fread(&reading_reader, sizeof(reading_reader), 1, reader)) != 0){
 		number_of_ids += 1;
 	}
-	int the_ids[number_of_ids];
-	fseek(reader, 0, SEEK_SET);
-	for(int i = 0; i < number_of_ids; i++){
-		fread(&reading_reader, sizeof(reading_reader), 1, reader);
-		the_ids[i] = reading_reader.self_id;
-	}
-	list_of_ids = &the_ids[0];
 	fclose(reader);
 	FILE *breader;
 	breader = fopen("books.dat", "rb");
@@ -663,7 +656,7 @@ void initialize(){
 	if(rPtr == NULL){
 		FILE *rrPtr;
 		rrPtr = fopen("requests.dat", "wb");
-		for(int i = 0; i < 2; i++)	
+		for(int i = 0; i < 2; i++)
 			fwrite(&(reqs[i]), sizeof(reqs[i]), 1, rrPtr);
 		fclose(rrPtr);
 	}
@@ -754,6 +747,6 @@ int main(){
 		}
 		else
 			printf("\n!!!!!!!!!!!!!!!!!- INVALID CHOICE -!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-	}	
+	}
 	return 0;
 }
