@@ -608,12 +608,12 @@ void initialize(){
 	first[0].book_id = -1;
 	first[1].book_id = -1;
 	first[2].book_id = -1;
-	strcpy(first[0].name, "Ansh Goel");
-	strcpy(first[1].name, "Sparsh Birla");
-	strcpy(first[2].name, "Moulik Srivastava");
-	strcpy(first[0].password, "anshgoel");
-	strcpy(first[1].password, "sparshbirla");
-	strcpy(first[2].password, "mouliksrivastava");
+	strcpy(first[0].name, "Ankit Sharma");
+	strcpy(first[1].name, "Saharsh Singh");
+	strcpy(first[2].name, "Manas Agrawal");
+	strcpy(first[0].password, "ankitsharma");
+	strcpy(first[1].password, "saharshsingh");
+	strcpy(first[2].password, "manasagrawal");
 	FILE *fPtr;
 	fPtr = fopen("students.dat", "rb");
 	if(fPtr == NULL){
@@ -750,3 +750,4 @@ int main(){
 	}
 	return 0;
 }
+
